@@ -2,9 +2,8 @@ provider "aws" {
   region = "us-east-1"
 }
 
-# -----------------------------
 # Data Sources
-# -----------------------------
+
 data "aws_vpc" "default" {
   default = true
 }
@@ -27,9 +26,7 @@ data "aws_ami" "ubuntu_22_04" {
   owners = ["099720109477"]
 }
 
-# -----------------------------
 # Security Groups
-# -----------------------------
 
 # ALB Security Group
 resource "aws_security_group" "alb" {
@@ -69,9 +66,9 @@ resource "aws_security_group" "instance" {
   }
 }
 
-# -----------------------------
+
 # Launch Template
-# -----------------------------
+
 resource "aws_launch_template" "example" {
   name_prefix   = var.cluster_name
   image_id      = data.aws_ami.ubuntu_22_04.id
@@ -90,12 +87,12 @@ resource "aws_launch_template" "example" {
   )
 }
 
-# -----------------------------
+
 # Target Group
-# -----------------------------
+
 resource "aws_lb_target_group" "asg" {
   name     = "${var.cluster_name}-tg"
-  port     = 80
+  port     = var.server_port
   protocol = "HTTP"
   vpc_id   = data.aws_vpc.default.id
 
@@ -108,9 +105,9 @@ resource "aws_lb_target_group" "asg" {
   }
 }
 
-# -----------------------------
+
 # Auto Scaling Group
-# -----------------------------
+
 resource "aws_autoscaling_group" "example" {
   min_size         = var.min_size
   max_size         = var.max_size
@@ -126,9 +123,9 @@ resource "aws_autoscaling_group" "example" {
   }
 }
 
-# -----------------------------
+
 # Load Balancer
-# -----------------------------
+
 resource "aws_lb" "example" {
   name               = var.cluster_name
   load_balancer_type = "application"
@@ -136,12 +133,12 @@ resource "aws_lb" "example" {
   security_groups    = [aws_security_group.alb.id]
 }
 
-# -----------------------------
+
 # Listener
-# -----------------------------
+
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.example.arn
-  port              = 80
+  port              = var.server_port
   protocol          = "HTTP"
 
   default_action {

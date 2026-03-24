@@ -24,3 +24,9 @@ variable "server_port" {
   type        = number
   default     = 80
 }
+
+variable "enable_http" {
+  description = "Enable HTTP traffic"
+  type        = bool
+  default     = true
+}
