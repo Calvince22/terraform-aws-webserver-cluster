@@ -8,4 +8,6 @@ output "asg_name" {
   description = "ASG name"
 }
 
-
+output "cpu_alarm_name" {
+  value = local.enable_monitoring ? aws_cloudwatch_metric_alarm.cpu[0].alarm_name : null
+}
